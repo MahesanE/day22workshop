@@ -2,6 +2,7 @@ package sg.edu.nus.iss.day22_workshop.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +44,11 @@ public class RSVPRepository {
         return jdbcTemplate.queryForObject(selectByIdSQL, BeanPropertyRowMapper.newInstance(RSVP.class), id);
     }
 
-    public RSVP findByName(String fullName) {
-        return jdbcTemplate.queryForObject(selectByNameSQL, BeanPropertyRowMapper.newInstance(RSVP.class), fullName);
+    public List<RSVP> findByName(String fullName) {
+        List<RSVP> findByName = new ArrayList<RSVP>();
+
+        findByName = jdbcTemplate.query(selectByNameSQL, BeanPropertyRowMapper.newInstance(RSVP.class), fullName);
+        return findByName;
     }
 
     public Boolean save(RSVP rsvp) {
@@ -56,15 +60,15 @@ public class RSVPRepository {
     }
 
     public Boolean update(RSVP rsvp) {
-        Integer iResult = jdbcTemplate.update(insertSQL, rsvp.getFullName(), rsvp.getEmail(), rsvp.getPhone(),
-                rsvp.getConfirmationDate(), rsvp.getComments());
+        Integer iResult = jdbcTemplate.update(updateSQL, rsvp.getFullName(), rsvp.getEmail(), rsvp.getPhone(),
+                rsvp.getConfirmationDate(), rsvp.getComments(), rsvp.getId());
 
         return iResult > 0 ? true : false;
     }
 
     public int[] batchUpdate(List<RSVP> rsvps) {
 
-        return jdbcTemplate.batchUpdate(insertSQL, new BatchPreparedStatementSetter() {
+        return jdbcTemplate.batchUpdate(updateSQL, new BatchPreparedStatementSetter() {
 
             public void setValues(PreparedStatement ps, int i) throws SQLException {
 

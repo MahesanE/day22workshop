@@ -51,16 +51,17 @@ public class RSVPController {
     }
 
     @GetMapping("")
-    public ResponseEntity<RSVP> findByName(@RequestParam("q") String name) {
-        RSVP rsvp = rsvpSvc.findByName(name);
-        if (rsvp != null) {
-            return new ResponseEntity<>(rsvp, HttpStatus.OK);
+    public ResponseEntity<List<RSVP>> findByName(@RequestParam("q") String name) {
+        List<RSVP> findByName = new ArrayList<RSVP>();
+        findByName = rsvpSvc.findByName(name);
+        if (findByName.isEmpty()) {
+            return new ResponseEntity<>(findByName, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(rsvp, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(findByName, HttpStatus.NOT_FOUND);
         }
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<String> createRSVP(@RequestBody RSVP rsvp) {
         Boolean created = rsvpSvc.save(rsvp);
 
@@ -73,14 +74,17 @@ public class RSVPController {
 
     @PutMapping({ "/{id}" })
     public ResponseEntity<String> updateRSVP(@PathVariable("id") Integer id, @RequestBody RSVP rsvp) {
-        Boolean updated = rsvpSvc.update(rsvp);
-
-        if (updated) {
-            return new ResponseEntity<>("RSVP has been updated", HttpStatus.OK);
+        RSVP rsvp2 = rsvpSvc.findById(id);
+        if (rsvp2 != null) {
+            boolean updated = rsvpSvc.update(rsvp);
+            if (updated) {
+                return new ResponseEntity<>("RSVP record successfully updated", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("RSVP not updated", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } else {
-            return new ResponseEntity<>("RSVP not updated sorry", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("RSVP not found", HttpStatus.NOT_FOUND);
         }
-
     }
 
 }

@@ -26,7 +26,7 @@ public class RSVPService {
         return rsvpRepo.findById(id);
     }
 
-    public RSVP findByName(String name){
+    public List<RSVP> findByName(String name){
         return rsvpRepo.findByName(name);
     }
 
